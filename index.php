@@ -5,3 +5,7 @@ if (!defined("DS")) {
 }
 
 include_once "config" . DS . "config.php";
+
+// Workers\Router::fix_mode();
+// Workers\Router::select_view("home"); // Start Routing
+Workers\Router::start(); // Start Routing

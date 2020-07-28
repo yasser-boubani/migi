@@ -13,7 +13,7 @@ define("APP_HOST", "localhost");
 define("DB_HOST", "localhost");
 
 // DB Constants
-define("USING_DB", TRUE); // Set it TRUE to start using database
+define("USING_DB", FALSE); // Set it TRUE to start using database
 define("DB_NAME", "db_name");
 define("DB_USERNAME", "root");
 define("DB_PASS", "db_pass");
