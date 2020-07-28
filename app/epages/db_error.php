@@ -1,6 +1,6 @@
 <?php
 header("HTTP/1.1 501 Not Implemented");
-if (!empty($data_view)) {
+if (!empty($view_data)) {
     $error = $view_data["error"];
 }
 ?>
