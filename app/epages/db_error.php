@@ -1,8 +1,5 @@
 <?php
 header("HTTP/1.1 501 Not Implemented");
-if (!empty($view_data)) {
-    $error = $view_data["error"];
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">

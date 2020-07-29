@@ -4,9 +4,9 @@ namespace App\Controllers;
 
 class Controller
 {
-    public $view_name;
+    const _view = null;
 
-    public function __constructor($vn) {
-        $this->view_name = $vn;
+    public function default() {
+        view($this::_view);
     }
 }

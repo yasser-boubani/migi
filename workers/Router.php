@@ -123,31 +123,30 @@ class Router
         //     }
         // }
 
-        // Route variables /{variable} (view data)
+        // Route variables /{variable} (uri_params)
         $final_route_arr = explode("/", $true_routes[0]);
-        $view_data = [];
+        $uri_params = [];
 
         for ($v = 1; $v < count($final_route_arr); $v++) {
             if (strpos($final_route_arr[$v], "{") === 0 && strrpos($final_route_arr[$v], "}")) {
                 $final_route_arr[$v] = str_replace("{", "", $final_route_arr[$v]);
                 $final_route_arr[$v] = str_replace("}", "", $final_route_arr[$v]);
-                // global ${$final_route_arr[$v]};
-                $view_data[$final_route_arr[$v]] = $uri_arr[$v];
+                $uri_params[$final_route_arr[$v]] = $uri_arr[$v];
             }
         }
 
         $target_arr = explode("->", $routes[$true_routes[0]]);
         if ($target_arr[0] == "view") {
 
-            view($target_arr[1], $view_data);
+            view($target_arr[1], $uri_params);
 
         } else if ($target_arr[0] == "controller") {
 
-            controller($target_arr[1], $view_data);
+            controller($target_arr[1], $uri_params);
 
         } else if ($target_arr[0] == "eview") {
 
-            eview($target_arr[1], $view_data);
+            eview($target_arr[1], $uri_params);
 
         } else {
 
