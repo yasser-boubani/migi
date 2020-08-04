@@ -9,6 +9,10 @@ include_once _WORKERS_ . "AutoLoader.php";
 include_once _NEEDS_ . "routes.functions.php";
 include_once _NEEDS_ . "routes.map.php"; // The required routes map for the Router
 
+if (ML) {
+    include_once _NEEDS_ . "language.control.php";
+}
+
 if (FIX_MODE) {
     eview("fix_mode");
 }

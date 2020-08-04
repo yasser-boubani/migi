@@ -4,9 +4,12 @@
 if (!defined("DS")) {
     define("DS", DIRECTORY_SEPARATOR);
 }
-define("FIX_MODE", FALSE);
-define("TIMEZONE", "Africa/Algiers");
+
+define("ML", TRUE); // Multiple Languages
 define("DEF_LANG", "en");
+define("TIMEZONE", "Africa/Algiers");
+
+define("FIX_MODE", FALSE);
 
 // Hosts Constants
 define("APP_HOST", "localhost");
