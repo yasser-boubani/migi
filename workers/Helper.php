@@ -13,10 +13,12 @@ class Helper
         }
     }
 
-    public static function inc_comp($comp_name, Array $vars = []) {
-        $comp_path = COMPONENTS . "_$comp_name.php";
+    public static function inc_comp($comp_name, Array $data = []) {
+        $comp_path = _COMPONENTS_ . "_$comp_name.php";
         if (file_exists($comp_path)) {
             include $comp_path;
+        } else {
+            exit("COMPONENT $comp_name doesn't exist!");
         }
     }
 
