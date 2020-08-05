@@ -1,0 +1,33 @@
+/* Start Main CSS */
+* {
+    box-sizing: border-box;
+}
+/* End Main CSS */
+
+/* Start Home Page */
+body {
+    padding: 0;
+    margin: 0;
+    font-family: Tahoma;
+    color: #B0BEC5;
+}
+
+.container {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+}
+
+.container .intro {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+}
+
+.intro h1 {
+    text-align: center;
+    margin: 0;
+    margin-bottom: 10px;
+}
+/* End Home Page */
