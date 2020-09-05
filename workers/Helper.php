@@ -201,4 +201,17 @@ class Helper
 
         return $number;
     }
+
+    /*
+    ** Convert number of seconds to Days:Hours:Minutes:Seconds Format
+    */
+    public static function DHMS_format($seconds) {
+        $dt1 = new \DateTime();
+        $dt2 = new \DateTime($seconds);
+        if ($dt1 > $dt2) {
+            return "--:--:--:--";
+        } else {
+            return $dt1->diff($dt2)->format("%a:%h:%i:%s");
+        }
+    }
 }

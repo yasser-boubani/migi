@@ -6,7 +6,7 @@ $_title = trans("HOME");
 
 $header_resources = [
     '<!-- Main Style -->',
-    '<link rel="stylesheet" href="' . FRONT_CSS . 'style.css">',
+    '<link rel="stylesheet" href="' . CSS . 'style.css">',
 ];
 
 $footer_resources = [
@@ -14,7 +14,7 @@ $footer_resources = [
     '<script>console.log("Hello, Migi!")</script>',
 ];
 
-include _TEMPLATES_ . "header.php";
+include _FRONT_TEMPS_ . "header.php";
 ?>
 
 <div class="container">
@@ -24,4 +24,4 @@ include _TEMPLATES_ . "header.php";
     </div>
 </div>
 
-<?php include _TEMPLATES_ . "footer.php"; ?>
+<?php include _FRONT_TEMPS_ . "footer.php"; ?>

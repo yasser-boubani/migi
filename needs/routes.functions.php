@@ -8,6 +8,9 @@ use Workers\Helper;
 */
 function view(String $view_name, Array $view_data = []) {
 
+    $view_name = str_replace("/", DS, $view_name);
+    $view_name = str_replace("\\", DS, $view_name);
+
     extract($view_data);
     
     if (!Helper::str_contains($view_name, ".php")) {
@@ -29,6 +32,9 @@ function view(String $view_name, Array $view_data = []) {
 */
 function eview(String $eview_name, Array $view_data = []) {
 
+    $eview_name = str_replace("/", DS, $eview_name);
+    $eview_name = str_replace("\\", DS, $eview_name);
+
     extract($view_data);
     
     if (!Helper::str_contains($eview_name, ".php")) {
@@ -47,6 +53,8 @@ function eview(String $eview_name, Array $view_data = []) {
  * 
  */
 function controller(String $controller_name, Array $parameters = []) {
+
+    $controller_name = str_replace("/", "\\", $view_name);
 
     $controller_name_arr = explode("@", $controller_name);
 

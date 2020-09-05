@@ -1,7 +1,11 @@
 <?php
 
+// Main Constants
 if (!defined("DS")) {
     define("DS", DIRECTORY_SEPARATOR);
+}
+if (!defined("_ROOT_")) {
+    define("_ROOT_", __DIR__ . DS);
 }
 
 include_once "config" . DS . "config.php";
