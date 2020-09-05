@@ -214,4 +214,11 @@ class Helper
             return $dt1->diff($dt2)->format("%a:%h:%i:%s");
         }
     }
+
+    /*
+    ** Get a random token
+    */
+    public static function random_token() {
+        return md5(uniqid() . "random");
+    }
 }
