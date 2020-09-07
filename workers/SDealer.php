@@ -6,13 +6,9 @@ class SDealer
 {
     public static function start() {
         session_start();
-        
         if (!isset($_SESSION["SID"])) {
             $_SESSION["SID"] = Helper::random_token();
         }
-
-        global $excluded_csrf_URIs;
-        require_once _NEEDS_ . "s.features.php"; // include session features s.features.php
     }
 
     public static function set($s_name, $s_value) {

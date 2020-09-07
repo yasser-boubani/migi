@@ -6,7 +6,7 @@ class Router
 {
     public static function start() {
         global $routes;
-        global $excluded_csrf_URIs;
+        global $excluded_csrf_routes;
 
         $uri = $_SERVER["REQUEST_URI"];
 
@@ -35,7 +35,7 @@ class Router
 
                     // csrf protection
                     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-                        if (in_array($uri, $excluded_csrf_URIs)) { // check if the URI is excluded from the csrf protection or not
+                        if (in_array($uri, $excluded_csrf_routes)) { // check if the URI is excluded from the csrf protection or not
                             view($target_arr[1]);
                         } else {
                             if (isset($_POST["_token"]) && $_POST["_token"] == SHA1(SDealer::get("SID"))) {
@@ -52,7 +52,7 @@ class Router
 
                     // csrf protection
                     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-                        if (in_array($uri, $excluded_csrf_URIs)) { // check if the URI is excluded from the csrf protection or not
+                        if (in_array($uri, $excluded_csrf_routes)) { // check if the URI is excluded from the csrf protection or not
                             controller($target_arr[1]);
                         } else {
                             if (isset($_POST["_token"]) && $_POST["_token"] == SHA1(SDealer::get("SID"))) {
@@ -168,7 +168,7 @@ class Router
 
             // csrf protection
             if ($_SERVER["REQUEST_METHOD"] == "POST") {
-                if (in_array($true_routes[0], $excluded_csrf_URIs)) { // check if the URI is excluded from the csrf protection or not
+                if (in_array($true_routes[0], $excluded_csrf_routes)) { // check if the URI is excluded from the csrf protection or not
                     view($target_arr[1], $uri_params);
                 } else {
                     if (isset($_POST["_token"]) && $_POST["_token"] == SHA1(SDealer::get("SID"))) {
@@ -185,7 +185,7 @@ class Router
 
             // csrf protection
             if ($_SERVER["REQUEST_METHOD"] == "POST") {
-                if (in_array($true_routes[0], $excluded_csrf_URIs)) { // check if the URI is excluded from the csrf protection or not
+                if (in_array($true_routes[0], $excluded_csrf_routes)) { // check if the URI is excluded from the csrf protection or not
                     controller($target_arr[1], $uri_params);
                 } else {
                     if (isset($_POST["_token"]) && $_POST["_token"] == SHA1(SDealer::get("SID"))) {

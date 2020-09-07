@@ -1,16 +1,15 @@
 <?php
 
-include_once "init.php";
+require_once "init.php";
 
 date_default_timezone_set(TIMEZONE); // SET TIMEZONE
 
-include_once _WORKERS_ . "AutoLoader.php";
+require_once _WORKERS_ . "AutoLoader.php";
 
-include_once _NEEDS_ . "routes.functions.php";
-include_once _NEEDS_ . "routes.map.php"; // The required routes map for the Router
+require_once _NEEDS_ . "routing.control.php";
 
 if (ML) {
-    include_once _NEEDS_ . "language.control.php";
+    require_once _NEEDS_ . "language.control.php";
 }
 
 if (FIX_MODE) {
@@ -18,5 +17,5 @@ if (FIX_MODE) {
 }
 
 if (USING_DB) {
-    include_once "db_con.php";
+    require_once "db_con.php";
 }

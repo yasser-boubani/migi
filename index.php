@@ -8,9 +8,7 @@ if (!defined("_ROOT_")) {
     define("_ROOT_", __DIR__ . DS);
 }
 
-include_once "config" . DS . "config.php";
-
-Workers\SDealer::start(); // Start the session
+require_once "config" . DS . "config.php";
 
 // Workers\Router::fix_mode(); // Turn the fix mode on
 // Workers\Router::select_view("home"); // Select a fixed view directly
