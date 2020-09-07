@@ -4,22 +4,140 @@ namespace Workers;
 
 /*
 **
-** filters:
-** 1- names ==> filter name [Name must be only normal characters without numbers or special chars]
-** 2- username ==> filter username [it must be only chars + number and its max length is 30 char]
-** 3- email ==> filter email
+** filters
 ** 
 */
 class Filter
 {
+
+    /*
+    ** return true if the $value matches the RegEx $pattern
+    */
+    public static function match($value, $pattern) {
+        return preg_match($pattern, $value);
+    }
+
+    /*
+    **
+    */
+    public static function boolean($value, $check_level = "soft") {
+        if ($check_level == "soft") {
+
+            return filter_var($value, FILTER_VALIDATE_BOOLEAN);
+
+        } else if ($check_level == "hard") {
+            if (gettype($value) === TRUE)
+            {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            exit("Invalid check level '$check_level'!");
+        }
+    }
+
+
+    /*
+    **
+    */
+    public static function string($value, $check_level = "soft") {
+        if ($check_level == "soft") {
+            if (gettype($value) == "string" ||
+                gettype($value) == "integer" || filter_var($value, FILTER_VALIDATE_INT) ||
+                gettype($value) == "double" || filter_var($value, FILTER_VALIDATE_FLOAT))
+            {
+                return true;
+            } else {
+                return false;
+            }
+        } else if ($check_level == "hard") {
+            if (gettype($value) == "string")
+            {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            exit("Invalid check level '$check_level'!");
+        }
+    }
+
+    /*
+    ** $level = "soft" // default
+    ** $level = "hard"
+    */
+    public static function number($value, $check_level = "soft") {
+        if ($check_level == "soft") {
+            if (filter_var($value, FILTER_VALIDATE_INT) || filter_var($value, FILTER_VALIDATE_FLOAT))
+            {
+                return true;
+            } else {
+                return false;
+            }
+        } else if ($check_level == "hard") {
+            if (gettype($value) == "integer" || gettype($value) == "double")
+            {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            exit("Invalid check level '$check_level'!");
+        }
+    }
+
+    /*
+    **
+    */
+    public static function integer($value, $check_level = "soft") {
+        if ($check_level == "soft") {
+
+            return filter_var($value, FILTER_VALIDATE_INT);
+
+        } else if ($check_level == "hard") {
+            if (gettype($value) == "integer")
+            {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            exit("Invalid check level '$check_level'!");
+        }
+    }
+
+    /*
+    **
+    */
+    public static function float($value, $check_level = "soft") {
+        if ($check_level == "soft") {
+
+            return filter_var($value, FILTER_VALIDATE_FLOAT);
+
+        } else if ($check_level == "hard") {
+            if (gettype($value) == "double")
+            {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            exit("Invalid check level '$check_level'!");
+        }
+    }
+
+    /*
+    **
+    */
     public static function names($name) // filter names
     {
         // the name have to "don't" match these patterns
         $p1 = "/[0-9\@\#\€\%\&\+\(\)\*\"\:\;\!\?\,\_\/\.\~\`\|\•\√\π\÷\×\¶\∆\£\¥\$\¢\^\°\=\{\}\\\©\®\™\℅\[\]\<\>]/";
-        $p2 = "/^(-|')/";  // ism yabd bi - wala '
-        $p3 = "/[-']{2,}/"; // lakan kayn -- ''
-        $p4 = "/(-'|'-)/"; // lkn kayn -' '-
-        $p5 = "/(.[-'].+){3,}/"; // lkn kayn bzf - '
+        $p2 = "/^(-|')/";  // starts with - or '
+        $p3 = "/[-']{2,}/"; // contains -- ''
+        $p4 = "/(-'|'-)/"; // contains -' '-
+        $p5 = "/(.[-'].+){3,}/"; // there are lots of - '
 
         if (preg_match($p1, $name) ||
             preg_match($p2, $name) ||
@@ -28,10 +146,13 @@ class Filter
             preg_match($p5, $name)) {
             return false;
         } else {
-            return true;
+            return self::string($name);
         }
     }
 
+    /*
+    **
+    */
     public static function username($username) // filter username
     {
         // false if match
@@ -43,13 +164,16 @@ class Filter
             return false;
         } else {
             if (preg_match($pattern, $username)) {
-                return true;
+                return self::string($username);
             } else {
                 return false;
             }
         }
     }
 
+    /*
+    **
+    */
     public static function email($email) // filter email
     {
         // false if match
@@ -61,12 +185,38 @@ class Filter
             return false;
         } else {
             if (preg_match($emailPattern, $email)) {
-                if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                    return true;
-                }
+                return filter_var($email, FILTER_VALIDATE_EMAIL);
             } else {
                 return false;
             }
         }
+    }
+
+    /*
+    **
+    */
+    public static function domain($domain) {
+        return filter_var($domain, FILTER_VALIDATE_DOMAIN);
+    }
+
+    /*
+    **
+    */
+    public static function ip($ip) {
+        return filter_var($ip, FILTER_VALIDATE_IP);
+    }
+
+    /*
+    **
+    */
+    public static function mac($mac) {
+        return filter_var($mac, FILTER_VALIDATE_MAC);
+    }
+
+    /*
+    **
+    */
+    public static function url($url) {
+        return filter_var($url, FILTER_VALIDATE_URL);
     }
 }
