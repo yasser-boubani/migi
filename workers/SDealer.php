@@ -6,25 +6,20 @@ class SDealer
 {
     public static function start() {
         session_start();
+        
+        if (!isset($_SESSION["SID"])) {
+            $_SESSION["SID"] = Helper::random_token();
+        }
+
+        global $excluded_csrf_URIs;
+        require_once _NEEDS_ . "s.features.php"; // include session features s.features.php
     }
 
     public static function set($s_name, $s_value) {
         if ($s_name != null && $s_name != "") {
-            if (!self::check($s_name)) {
-                $_SESSION[$s_name] = $s_value;
-            } else {
-                exit("The session '$s_name' is already exist! use change() method if you want to override its value.");
-            }
-        } else {
-            exit("Invalid session name!");
-        }
-    }
-
-    public static function change($s_name, $s_value) {
-        if (self::check($s_name)) {
             $_SESSION[$s_name] = $s_value;
         } else {
-            exit("The session $s_name doesn't exist!");
+            exit("Invalid session name!");
         }
     }
 

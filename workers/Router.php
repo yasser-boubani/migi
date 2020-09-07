@@ -6,6 +6,7 @@ class Router
 {
     public static function start() {
         global $routes;
+        global $excluded_csrf_URIs;
 
         $uri = $_SERVER["REQUEST_URI"];
 
@@ -32,11 +33,37 @@ class Router
 
                 if ($target_arr[0] == "view") {
 
-                    view($target_arr[1]);
+                    // csrf protection
+                    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+                        if (in_array($uri, $excluded_csrf_URIs)) { // check if the URI is excluded from the csrf protection or not
+                            view($target_arr[1]);
+                        } else {
+                            if (isset($_POST["_token"]) && $_POST["_token"] == SHA1(SDealer::get("SID"))) {
+                                view($target_arr[1]);
+                            } else {
+                                eview("expired");
+                            }
+                        }
+                    } else {
+                        view($target_arr[1]);
+                    }
 
                 } else if ($target_arr[0] == "controller") {
 
-                    controller($target_arr[1]);
+                    // csrf protection
+                    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+                        if (in_array($uri, $excluded_csrf_URIs)) { // check if the URI is excluded from the csrf protection or not
+                            controller($target_arr[1]);
+                        } else {
+                            if (isset($_POST["_token"]) && $_POST["_token"] == SHA1(SDealer::get("SID"))) {
+                                controller($target_arr[1]);
+                            } else {
+                                eview("expired");
+                            }
+                        }
+                    } else {
+                        controller($target_arr[1]);
+                    }
 
                 } else if ($target_arr[0] == "eview") {
 
@@ -135,14 +162,41 @@ class Router
             }
         }
 
+         // ******
         $target_arr = explode("->", $routes[$true_routes[0]]);
         if ($target_arr[0] == "view") {
 
-            view($target_arr[1], $uri_params);
+            // csrf protection
+            if ($_SERVER["REQUEST_METHOD"] == "POST") {
+                if (in_array($true_routes[0], $excluded_csrf_URIs)) { // check if the URI is excluded from the csrf protection or not
+                    view($target_arr[1], $uri_params);
+                } else {
+                    if (isset($_POST["_token"]) && $_POST["_token"] == SHA1(SDealer::get("SID"))) {
+                        view($target_arr[1], $uri_params);
+                    } else {
+                        eview("expired");
+                    }
+                }
+            } else {
+                view($target_arr[1], $uri_params);
+            }
 
         } else if ($target_arr[0] == "controller") {
 
-            controller($target_arr[1], $uri_params);
+            // csrf protection
+            if ($_SERVER["REQUEST_METHOD"] == "POST") {
+                if (in_array($true_routes[0], $excluded_csrf_URIs)) { // check if the URI is excluded from the csrf protection or not
+                    controller($target_arr[1], $uri_params);
+                } else {
+                    if (isset($_POST["_token"]) && $_POST["_token"] == SHA1(SDealer::get("SID"))) {
+                        controller($target_arr[1], $uri_params);
+                    } else {
+                        eview("expired");
+                    }
+                }
+            } else {
+                controller($target_arr[1], $uri_params);
+            }
 
         } else if ($target_arr[0] == "eview") {
 
@@ -152,7 +206,7 @@ class Router
 
             exit("Invalid target delimiter ({$target_arr[0]}) in the ($target) route");
 
-        }
+        } // ******
     }
 
     public static function select_view(String $view_name, Array $view_data = []) {

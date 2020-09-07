@@ -54,7 +54,7 @@ function eview(String $eview_name, Array $view_data = []) {
  */
 function controller(String $controller_name, Array $parameters = []) {
 
-    $controller_name = str_replace("/", "\\", $view_name);
+    $controller_name = str_replace("/", "\\", $controller_name);
 
     $controller_name_arr = explode("@", $controller_name);
 
