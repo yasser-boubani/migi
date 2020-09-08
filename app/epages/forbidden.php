@@ -1,17 +1,17 @@
 <?php
-header("HTTP/1.1 200 Fix Mode");
+header("HTTP/1.0 403 Forbidden");
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Site Maintenance</title>
+    <title>Page Expired</title>
     <style>
         * {
             box-sizing: border-box;
         }
-
+        
         body {
             color: #B0BEC5;
             font-family: Tahoma;
@@ -37,7 +37,7 @@ header("HTTP/1.1 200 Fix Mode");
 </head>
 <body>
     <div class="container">
-        <div class="note">The site is undergoing maintenance, we'll back soon.</div>
+        <div class="note"><b>403</b> | You have no permission to access this page</div>
     </div>
 </body>
 </html>

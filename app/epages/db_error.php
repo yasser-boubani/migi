@@ -25,6 +25,8 @@ header("HTTP/1.1 501 Not Implemented");
         }
 
         .note {
+            width: 100%;
+            text-align: center;
             font-size: 2em;
             position: absolute;
             top: 50%;

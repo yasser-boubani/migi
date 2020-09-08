@@ -26,6 +26,8 @@ header("HTTP/1.0 419 unknown status");
         }
 
         .note {
+            width: 100%;
+            text-align: center;
             position: absolute;
             top: 50%;
             left: 50%;
