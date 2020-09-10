@@ -37,7 +37,7 @@ header("HTTP/1.0 403 Forbidden");
 </head>
 <body>
     <div class="container">
-        <div class="note"><b>403</b> | You have no permission to access this page</div>
+        <div class="note"><b>403</b> | Forbidden Access</div>
     </div>
 </body>
 </html>

@@ -9,6 +9,12 @@ Routing Wall:
                     // method->key === method->key->null
     "controller->controllerName->action" => "method->key->value",
     // "controller->controllerName" === all actions in this controller
+
+    "condition->chain" can be written in more options way (as an array):
+        [
+            "condition->chain", // condition chain
+            "action if condition is false" // action if false (it can be 'back'[redirect to previous page or /], or 'eview name'['forbidden' eview is the default] )
+        ]
     
 */
 // assoc

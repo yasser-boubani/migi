@@ -9,47 +9,127 @@ use Workers\CDealer;
 ** Routing Wall functions
 **
 */
-function chain_method_session($key, $value) {
+function chain_method_session($key, $value = null, $action = "forbidden") {
     if (!SDealer::check($key)) {
-        eview("forbidden");
+        if ($action == "back") {
+            if (isset($_SERVER["HTTP_REFERER"])) {
+                Helper::redirect($_SERVER["HTTP_REFERER"]);
+            } else {
+                Helper::redirect("/");
+            }
+        } else if (Helper::str_starts_with($action, "/")) {
+            Helper::redirect($action);
+        } else {
+            eview($action);
+        }
     }
 
     if ($value !== null) {
         if (SDealer::get($key) !== $value) {
-            eview("forbidden");
+            if ($action == "back") {
+                if (isset($_SERVER["HTTP_REFERER"])) {
+                    Helper::redirect($_SERVER["HTTP_REFERER"]);
+                } else {
+                    Helper::redirect("/");
+                }
+            } else if (Helper::str_starts_with($action, "/")) {
+                Helper::redirect($action);
+            } else {
+                eview($action);
+            }
         }
     }
 }
-function chain_method_cookie($key, $value) {
+function chain_method_cookie($key, $value = null, $action = "forbidden") {
     if (!CDealer::check($key)) {
-        eview("forbidden");
+        if ($action == "back") {
+            if (isset($_SERVER["HTTP_REFERER"])) {
+                Helper::redirect($_SERVER["HTTP_REFERER"]);
+            } else {
+                Helper::redirect("/");
+            }
+        } else if (Helper::str_starts_with($action, "/")) {
+            Helper::redirect($action);
+        } else {
+            eview($action);
+        }
     }
 
     if ($value !== null) {
         if (CDealer::get($key) !== $value) {
-            eview("forbidden");
+            if ($action == "back") {
+                if (isset($_SERVER["HTTP_REFERER"])) {
+                    Helper::redirect($_SERVER["HTTP_REFERER"]);
+                } else {
+                    Helper::redirect("/");
+                }
+            } else if (Helper::str_starts_with($action, "/")) {
+                Helper::redirect($action);
+            } else {
+                eview($action);
+            }
         }
     }
 }
-function chain_method_get($key, $value) {
+function chain_method_get($key, $value = null, $action = "forbidden") {
     if (!isset($_GET[$key])) {
-        eview("forbidden");
+        if ($action == "back") {
+            if (isset($_SERVER["HTTP_REFERER"])) {
+                Helper::redirect($_SERVER["HTTP_REFERER"]);
+            } else {
+                Helper::redirect("/");
+            }
+        } else if (Helper::str_starts_with($action, "/")) {
+            Helper::redirect($action);
+        } else {
+            eview($action);
+        }
     }
 
     if ($value !== null) {
         if ($_GET[$key] !== $value) {
-            eview("forbidden");
+            if ($action == "back") {
+                if (isset($_SERVER["HTTP_REFERER"])) {
+                    Helper::redirect($_SERVER["HTTP_REFERER"]);
+                } else {
+                    Helper::redirect("/");
+                }
+            } else if (Helper::str_starts_with($action, "/")) {
+                Helper::redirect($action);
+            } else {
+                eview($action);
+            }
         }
     }
 }
-function chain_method_post($key, $value) {
+function chain_method_post($key, $value = null, $action = "forbidden") {
     if (!isset($_POST[$key])) {
-        eview("forbidden");
+        if ($action == "back") {
+            if (isset($_SERVER["HTTP_REFERER"])) {
+                Helper::redirect($_SERVER["HTTP_REFERER"]);
+            } else {
+                Helper::redirect("/");
+            }
+        } else if (Helper::str_starts_with($action, "/")) {
+            Helper::redirect($action);
+        } else {
+            eview($action);
+        }
     }
 
     if ($value !== null) {
         if ($_POST[$key] !== $value) {
-            eview("forbidden");
+            if ($action == "back") {
+                if (isset($_SERVER["HTTP_REFERER"])) {
+                    Helper::redirect($_SERVER["HTTP_REFERER"]);
+                } else {
+                    Helper::redirect("/");
+                }
+            } else if (Helper::str_starts_with($action, "/")) {
+                Helper::redirect($action);
+            } else {
+                eview($action);
+            }
         }
     }
 }
@@ -67,8 +147,16 @@ function view(String $view_name, Array $view_data = []) {
 
     if (!in_array("view->$view_name", $excluded_wall_rules)) { // if this view is not excluded from the wall rules
         if (isset($wall_rules["view->$view_name"])) { // if this view exists in the wall rules
-            $condition_chain = $wall_rules["view->$view_name"];
-            $condition_chain_arr = explode("->", $condition_chain);
+
+            if (is_array($wall_rules["view->$view_name"])) {
+                $condition_chain = $wall_rules["view->$view_name"][0];
+                $condition_chain_arr = explode("->", $condition_chain);
+                $action_if_false = $wall_rules["view->$view_name"][1];
+            } else {
+                $condition_chain = $wall_rules["view->$view_name"];
+                $condition_chain_arr = explode("->", $condition_chain);
+                $action_if_false = "forbidden";
+            }
 
             if (count($condition_chain_arr) == 2) {
                 $chain_method = $condition_chain_arr[0];
@@ -85,8 +173,8 @@ function view(String $view_name, Array $view_data = []) {
             if ($chain_method == "session" || $chain_method == "cookie" ||
                 $chain_method == "get" || $chain_method == "post")
             {
-                // (function_name)(key, value)
-                ("chain_method_".$chain_method)($chain_key, $chain_value);
+                // (function_name)(key, value, action)
+                ("chain_method_".$chain_method)($chain_key, $chain_value, $action_if_false);
             } else {
                 exit("Invalid chain method '$chain_method' in '$condition_chain'!");
             }
@@ -153,14 +241,22 @@ function controller(String $controller_name, Array $parameters = []) {
     $temp_controller_name_without_action = explode("->", $temp_controller_name);
     $temp_controller_name_without_action = $temp_controller_name_without_action[0];
 
-    // Helper::pp($temp_controller_name_without_action);
+    // Helper::pp($temp_controller_name);
 
     if (!in_array("controller->$temp_controller_name", $excluded_wall_rules)
         && !in_array("controller->$temp_controller_name_without_action", $excluded_wall_rules)
     ) { // if this controller is not excluded from the wall rules
         if (isset($wall_rules["controller->$temp_controller_name"])) { // if this controller exists in the wall rules
-            $condition_chain = $wall_rules["controller->$temp_controller_name"];
-            $condition_chain_arr = explode("->", $condition_chain);
+
+            if (is_array($wall_rules["controller->$temp_controller_name"])) {
+                $condition_chain = $wall_rules["controller->$temp_controller_name"][0];
+                $condition_chain_arr = explode("->", $condition_chain);
+                $action_if_false = $wall_rules["controller->$temp_controller_name"][1];
+            } else {
+                $condition_chain = $wall_rules["controller->$temp_controller_name"];
+                $condition_chain_arr = explode("->", $condition_chain);
+                $action_if_false = "forbidden";
+            }
 
             if (count($condition_chain_arr) == 2) {
                 $chain_method = $condition_chain_arr[0];
@@ -177,14 +273,22 @@ function controller(String $controller_name, Array $parameters = []) {
             if ($chain_method == "session" || $chain_method == "cookie" ||
                 $chain_method == "get" || $chain_method == "post")
             {
-                // (function_name)(key, value)
-                ("chain_method_".$chain_method)($chain_key, $chain_value);
+                // (function_name)(key, value, action_if_false)
+                ("chain_method_".$chain_method)($chain_key, $chain_value, $action_if_false);
             } else {
                 exit("Invalid chain method '$chain_method' in '$condition_chain'!");
             }
         } else if (isset($wall_rules["controller->$temp_controller_name_without_action"])) { // if this controller exists in the wall rules
-            $condition_chain = $wall_rules["controller->$temp_controller_name_without_action"];
-            $condition_chain_arr = explode("->", $condition_chain);
+            
+            if (is_array($wall_rules["controller->$temp_controller_name_without_action"])) {
+                $condition_chain = $wall_rules["controller->$temp_controller_name_without_action"][0];
+                $condition_chain_arr = explode("->", $condition_chain);
+                $action_if_false = $wall_rules["controller->$temp_controller_name_without_action"][1];
+            } else {
+                $condition_chain = $wall_rules["controller->$temp_controller_name_without_action"];
+                $condition_chain_arr = explode("->", $condition_chain);
+                $action_if_false = "forbidden";
+            }
 
             if (count($condition_chain_arr) == 2) {
                 $chain_method = $condition_chain_arr[0];
@@ -201,8 +305,8 @@ function controller(String $controller_name, Array $parameters = []) {
             if ($chain_method == "session" || $chain_method == "cookie" ||
                 $chain_method == "get" || $chain_method == "post")
             {
-                // (function_name)(key, value)
-                ("chain_method_".$chain_method)($chain_key, $chain_value);
+                // (function_name)(key, value, action_if_false)
+                ("chain_method_".$chain_method)($chain_key, $chain_value, $action_if_false);
             } else {
                 exit("Invalid chain method '$chain_method' in '$condition_chain'!");
             }
