@@ -27,6 +27,16 @@ class SDealer
         }
     }
 
+    public static function get_once($s_name) {
+        if (isset($_SESSION[$s_name])) {
+            $temp = $_SESSION[$s_name];
+            self::unset($s_name);
+            return $temp;
+        } else {
+            exit("The session '$s_name' doesn't exist!");
+        }
+    }
+
     public static function check($s_name) : Bool {
         if (isset($_SESSION[$s_name])) {
             return true;
