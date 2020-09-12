@@ -14,12 +14,12 @@ class Model
 
     /*
     **
-    ** function createRow($table, array $columns, array $data))
-    ** createRow
+    ** function create($table, array $columns, array $data))
+    ** create Row
     ** INSERT INTO $table (array_keys) VALUES (array_values)
     **
     */
-    protected function createRow($table, array $data)
+    public function create($table, array $data)
     {
         global $con;
 
@@ -46,12 +46,12 @@ class Model
 
     /*
     **
-    ** getRow($colName, $value)
+    ** get($colName, $value)
     ** get a record
     ** SELECT * FROM $this->table WHERE $colName = $value
     **
     */
-    protected function getRow($colName, $value)
+    public function get($colName, $value)
     {
         global $con;
 
@@ -65,12 +65,12 @@ class Model
 
     /*
     **
-    ** getRows($colName, $value)
-    ** get a record
+    ** get($colName, $value)
+    ** get all records
     ** SELECT * FROM $this->table WHERE $colName = $value
     **
     */
-    protected function getRows($options = null)
+    public function get_all($options = null)
     {
         global $con;
 
@@ -84,12 +84,12 @@ class Model
 
     /*
     **
-    ** function updateRow($table, array $columns, array $data))
-    ** updateRow
+    ** function update($table, array $columns, array $data))
+    ** update Row
     ** INSERT INTO $table (array_keys) VALUES (array_values)
     **
     */
-    protected function updateRow($table, array $data, $where)
+    public function update($table, array $data, $where)
     {
         global $con;
 
@@ -116,7 +116,7 @@ class Model
     /*
     **
     */
-    protected function deleteRow($colName, $value)
+    public function delete($colName, $value)
     {
         global $con;
 
