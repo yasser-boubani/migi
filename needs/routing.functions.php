@@ -241,6 +241,10 @@ function controller(String $controller_name, Array $parameters = []) {
     $temp_controller_name_without_action = explode("->", $temp_controller_name);
     $temp_controller_name_without_action = $temp_controller_name_without_action[0];
 
+    if (Helper::str_contains($temp_controller_name, "(") && Helper::str_ends_with($temp_controller_name, ")")) {
+        $temp_controller_name = substr($temp_controller_name, 0, strpos($temp_controller_name, "("));
+    }
+
     // Helper::pp($temp_controller_name);
 
     if (!in_array("controller->$temp_controller_name", $excluded_wall_rules)
