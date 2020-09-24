@@ -24,6 +24,16 @@ class CDealer
         }
     }
 
+    public static function get_once($c_name) {
+        if (isset($_COOKIE[$c_name])) {
+            $temp = $_COOKIE[$c_name];
+            self::unset($c_name);
+            return $temp;
+        } else {
+            exit("The cookie '$c_name' doesn't exist!");
+        }
+    }
+
     public static function check($c_name) : Bool {
         if (isset($_COOKIE[$c_name])) {
             return true;

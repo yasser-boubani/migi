@@ -14,14 +14,20 @@ class Model
 
     /*
     **
-    ** function create($table, array $columns, array $data))
+    ** function create(array $data, $table_name = null))
     ** create Row
     ** INSERT INTO $table (array_keys) VALUES (array_values)
     **
     */
-    public function create($table, array $data)
+    public function create(array $data, $table_name = null)
     {
         global $con;
+
+        if ($table_name == null) {
+            $table = $this->_table;
+        } else {
+            $table = $table_name;
+        }
 
         $columns = array_keys($data);
         $values = array_values($data);
@@ -46,16 +52,22 @@ class Model
 
     /*
     **
-    ** get($colName, $value)
+    ** get($col_name, $value, $columns = "*", $table_name = null)
     ** get a record
-    ** SELECT * FROM $this->table WHERE $colName = $value
+    ** SELECT $columns FROM $table WHERE $col_name = $value
     **
     */
-    public function get($colName, $value)
+    public function get($col_name, $value, $columns = "*", $table_name = null)
     {
         global $con;
 
-        $query = "SELECT * FROM $this->table WHERE $colName = ?";
+        if ($table_name == null) {
+            $table = $this->_table;
+        } else {
+            $table = $table_name;
+        }
+
+        $query = "SELECT $columns FROM $table WHERE $col_name = ?";
         $stmt = $con->prepare($query);
         $stmt->execute(array($value));
         $row = $stmt->fetch(\PDO::FETCH_ASSOC);
@@ -65,16 +77,22 @@ class Model
 
     /*
     **
-    ** get($colName, $value)
+    ** get_all($columns = "*", $options = null, $table_name = null)
     ** get all records
-    ** SELECT * FROM $this->table WHERE $colName = $value
+    ** SELECT $columns FROM $table WHERE $col_name = $value
     **
     */
-    public function get_all($options = null)
+    public function get_all($columns = "*", $options = null, $table_name = null)
     {
         global $con;
 
-        $query = "SELECT * FROM $this->table $options";
+        if ($table_name == null) {
+            $table = $this->_table;
+        } else {
+            $table = $table_name;
+        }
+
+        $query = "SELECT $columns FROM $table $options";
         $stmt = $con->prepare($query);
         $stmt->execute();
         $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -84,14 +102,20 @@ class Model
 
     /*
     **
-    ** function update($table, array $columns, array $data))
+    ** function update(array $data, $where, $table_name = null)
     ** update Row
     ** INSERT INTO $table (array_keys) VALUES (array_values)
     **
     */
-    public function update($table, array $data, $where)
+    public function update(array $data, $where, $table_name = null)
     {
         global $con;
+
+        if ($table_name == null) {
+            $table = $this->_table;
+        } else {
+            $table = $table_name;
+        }
 
         $columns = array_keys($data);
         $values = array_values($data);
@@ -115,12 +139,22 @@ class Model
 
     /*
     **
+    ** function delete($col_name, $value, $table_name = null)
+    ** Delete Row
+    ** INSERT INTO $table (array_keys) VALUES (array_values)
+    **
     */
-    public function delete($colName, $value)
+    public function delete($col_name, $value, $table_name = null)
     {
         global $con;
 
-        $query = "DELETE FROM $this->table WHERE $colName =  ?";
+        if ($table_name == null) {
+            $table = $this->_table;
+        } else {
+            $table = $table_name;
+        }
+
+        $query = "DELETE FROM $table WHERE $col_name =  ?";
         $stmt = $con->prepare($query);
         return $stmt->execute(array($value));
     }
@@ -128,7 +162,7 @@ class Model
     /*
     **
     ** function CQ($query)
-    ** execute a custom query (to fetch data)
+    ** execute a custom query
     ** 
     */
     public static function CQ($query, String $action = "fetch_all")
@@ -142,6 +176,8 @@ class Model
             return $stmt->fetch(\PDO::FETCH_ASSOC);
         } elseif ($action == "count") { // get row count
             return $stmt->rowCount();
+        } elseif ($action == "execute") { // execute a query
+            return $stmt->execute();
         } else {
             return $stmt->fetchAll(\PDO::FETCH_ASSOC);
         }
