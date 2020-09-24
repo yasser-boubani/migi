@@ -9,7 +9,6 @@ if (!defined("_ROOT_")) {
 }
 
 require_once "config" . DS . "config.php";
-// require_once _NEEDS_ . "mail.control.php"; // Uncomment this if you want to use Mailer
 
 // Workers\Router::fix_mode(); // Turn the fix mode on
 // Workers\Router::select_view("home"); // Select a fixed view directly

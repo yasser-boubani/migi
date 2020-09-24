@@ -19,3 +19,7 @@ if (FIX_MODE) {
 if (USING_DB) {
     require_once "db_con.php";
 }
+
+if (USE_MAILER) {
+    require_once _NEEDS_ . "mail.control.php";
+}

@@ -21,6 +21,9 @@ define("DB_NAME", "db_name");
 define("DB_USERNAME", "db_username");
 define("DB_PASS", "db_password");
 
+// Mailer
+define("USE_MAILER", TRUE);
+
 // Important Directories Paths
 if (!defined("_ROOT_")) {
     define("_ROOT_", __DIR__ . DS . ".." . DS);

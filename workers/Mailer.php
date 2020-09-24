@@ -37,6 +37,10 @@ class Mailer
                 Array $attachments = [],
                 Array $options = []
     ) {
+        if (!USE_MAILER) {
+            exit("Error: When you need to use Mailer, you have to set the constant USE_MAILER to TRUE first.");
+        }
+
         $this->receiver_name = $receiver_name;
         $this->receiver_email = $receiver_email;
         $this->subject = $subject;
