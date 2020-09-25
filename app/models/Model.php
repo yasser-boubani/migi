@@ -182,4 +182,183 @@ class Model
             return $stmt->fetchAll(\PDO::FETCH_ASSOC);
         }
     }
+
+        /*
+    ** The 'join' Method for make a join statement.
+    ** $columns --> columns we want to select from the primary table
+    ** $final_table_structure --> the finale joined table form:
+        [
+            [
+                "table1" => "col1, col2, col3...",
+                "join type (INNER, LEFT, RIGHT)" => "ON statement - eg: primary_table.id = table1.item_id"
+            ],
+            [
+                "table2" => "col1, col2, col3...",
+                "join type (INNER, LEFT, RIGHT)" => "ON statement - eg: primary_table.id = table2.item_id"
+            ],
+        ]
+    ** $options --> If you want more options, for instance: 'ORDER BY --- ASC LIMIT 3'
+    ** $table_name --> if you need to select a custom table name (For example you don't use a custom model)
+    */
+    public function join(
+        $columns = "*",
+        Array $final_table_structure = [],
+        $options = null,
+        $table_name = null // the primary table (leave it null if you use custom model with protected $_table property)
+    )
+    {
+        global $con;
+
+        if ($table_name == null) {
+        $table = $this->_table;
+        } else {
+        $table = $table_name;
+        }
+
+        $join_on_list = [];
+
+        /*
+        ** in case we send the $columns parameter contains more than one item to select like:
+        "col1, col2, col3..."
+        ** We need to make the sentence like this:
+        "table.col1, table.col2, table.col3..."
+        ** to ignore any conflict problems
+        */
+        $temp_columns = str_replace(", ", ",", $columns);
+        $temp_columns = explode(",", rtrim($temp_columns, ", "));
+        $temp_columns = implode(", $table_name.", $temp_columns);
+        $select = "$table_name.$temp_columns, ";
+
+        // $current_table_structure_key -> table name
+        // $current_table_structure_value -> columns
+
+        for ($i = 0; $i < count($final_table_structure); $i++) {
+        /*
+        ** current_table_structure_keys[0] -> current table name
+        ** current_table_structure_keys[1] -> join type (INNER, LEFt, RIGHT)
+        ** current_table_structure_values[0] -> current table columns 
+        ** current_table_structure_values[1] -> ON statement - eg: (table1.id = table2.item_id)
+        */
+        // 1- select statement
+        $current_table_structure_keys = array_keys($final_table_structure[$i]);
+        $current_table_structure_values = array_values($final_table_structure[$i]);
+
+        $temp_values = str_replace(", ", ",", $current_table_structure_values[0]);
+        $temp_values = explode(",", rtrim($temp_values, ", "));
+        $temp_values = implode(", $current_table_structure_keys[0].", $temp_values);
+        if ($i === count($final_table_structure)-1) {
+            $select .= $current_table_structure_keys[0] . "." . $temp_values;
+        } else {
+            $select .= $current_table_structure_keys[0] . "." . $temp_values . ", ";
+        }
+
+        // 2- join_on_list statements
+        $join_on_list[$i] = "$current_table_structure_keys[1] JOIN $current_table_structure_keys[0] ON $current_table_structure_values[1]";
+        }
+
+        $query = "SELECT $select FROM $table ";
+
+        foreach($join_on_list as $join_on_item) {
+        $query .= "$join_on_item ";
+        }
+
+        if ($options !== null) {
+        $query .= " $options";
+        }
+
+        $stmt = $con->prepare($query);
+        $stmt->execute();
+        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        return $rows;
+    }
+
+    /*
+    ** The 'join' Method for make a join statement.
+    ** $columns --> columns we want to select from the primary table
+    ** $final_table_structure --> Assoc Array of the tables we want to join them the the primary table:
+        [
+            "tbale1" => "col1, col2, col3...",
+            "tbale2" => "col1, col2, col3..."
+        ]
+    ** $join_structure --> Indexed Array of JOIN type (INNER, LEFT, RIGHT):
+        [
+            "INNER", // for "tbale1"
+            "INNER", // for "tbale2"
+        ]
+    ** $on_structure --> Indexed Array of ON condition statement:
+        [
+            "primary_table.id = table1.item_id", // for "tbale1"
+            "primary_table.id = table2.item_id", // for "tbale2"
+            "",
+        ]
+    ** Note: the length of the previous arrays must be same.
+    ** $options --> If you want more options, for instance: 'ORDER BY --- ASC LIMIT 3'
+    ** $table_name --> if you need to select a custom table name (For example you don't use a custom model)
+    */
+    public function join2(
+                    $columns = "*",
+                    Array $final_table_structure = [],
+                    Array $join_structure = [],
+                    Array $on_structure = [],
+                    $options = null,
+                    $table_name = null // the primary table (leave it null if you use custom model with protected $_table property)
+    )
+    {
+        global $con;
+
+        if ($table_name == null) {
+            $table = $this->_table;
+        } else {
+            $table = $table_name;
+        }
+
+        if (count($final_table_structure) !== count($join_structure)
+        || count($final_table_structure) !== count($on_structure))
+        {
+            exit("Check the parameters you sent in the 'join' method, arrays lengths do not match!");
+        }
+
+        $final_table_structure_keys = array_keys($final_table_structure);
+        $final_table_structure_values = array_values($final_table_structure);
+
+        /*
+        ** in case we send the $columns parameter contains more than one item to select like:
+            "col1, col2, col3..."
+        ** We need to make the sentence like this:
+            "table.col1, table.col2, table.col3..."
+        ** to ignore any conflict problems
+        */
+        $temp_columns = str_replace(", ", ",", $columns);
+        $temp_columns = explode(",", rtrim($temp_columns, ", "));
+        $temp_columns = implode(", $table_name.", $temp_columns);
+        $select = "$table_name.$temp_columns, ";
+        
+        for ($i = 0; $i < count($final_table_structure); $i++) {
+            $temp_values = str_replace(", ", ",", $final_table_structure_values[$i]);
+            $temp_values = explode(",", rtrim($temp_values, ", "));
+            $temp_values = implode(", $final_table_structure_keys[$i].", $temp_values);
+            if ($i === count($final_table_structure)-1) {
+                $select .= $final_table_structure_keys[$i] . "." . $temp_values;
+            } else {
+                $select .= $final_table_structure_keys[$i] . "." . $temp_values . ", ";
+            }
+        }
+
+        $query = "SELECT $select FROM $table ";
+
+        for ($i = 0; $i < count($final_table_structure); $i++) {
+            $query .= $join_structure[$i] . " JOIN " . $final_table_structure_keys[$i] . " ON " . $on_structure[$i] . " ";
+        }
+
+        if ($options !== null) {
+            $query .= " $options";
+        }
+        
+        $stmt = $con->prepare($query);
+        $stmt->execute();
+        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        return $rows;
+    }
 }
