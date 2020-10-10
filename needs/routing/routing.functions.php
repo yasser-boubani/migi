@@ -6,144 +6,24 @@ use Workers\CDealer;
 
 /*
 **
-** Routing Wall functions
-**
-*/
-function chain_method_session($key, $value = null, $action = "forbidden") {
-    if (!SDealer::check($key)) {
-        if ($action == "back") {
-            if (isset($_SERVER["HTTP_REFERER"])) {
-                Helper::redirect($_SERVER["HTTP_REFERER"]);
-            } else {
-                Helper::redirect("/");
-            }
-        } else if (Helper::str_starts_with($action, "/")) {
-            Helper::redirect($action);
-        } else {
-            eview($action);
-        }
-    }
-
-    if ($value !== null) {
-        if (SDealer::get($key) !== $value) {
-            if ($action == "back") {
-                if (isset($_SERVER["HTTP_REFERER"])) {
-                    Helper::redirect($_SERVER["HTTP_REFERER"]);
-                } else {
-                    Helper::redirect("/");
-                }
-            } else if (Helper::str_starts_with($action, "/")) {
-                Helper::redirect($action);
-            } else {
-                eview($action);
-            }
-        }
-    }
-}
-function chain_method_cookie($key, $value = null, $action = "forbidden") {
-    if (!CDealer::check($key)) {
-        if ($action == "back") {
-            if (isset($_SERVER["HTTP_REFERER"])) {
-                Helper::redirect($_SERVER["HTTP_REFERER"]);
-            } else {
-                Helper::redirect("/");
-            }
-        } else if (Helper::str_starts_with($action, "/")) {
-            Helper::redirect($action);
-        } else {
-            eview($action);
-        }
-    }
-
-    if ($value !== null) {
-        if (CDealer::get($key) !== $value) {
-            if ($action == "back") {
-                if (isset($_SERVER["HTTP_REFERER"])) {
-                    Helper::redirect($_SERVER["HTTP_REFERER"]);
-                } else {
-                    Helper::redirect("/");
-                }
-            } else if (Helper::str_starts_with($action, "/")) {
-                Helper::redirect($action);
-            } else {
-                eview($action);
-            }
-        }
-    }
-}
-function chain_method_get($key, $value = null, $action = "forbidden") {
-    if (!isset($_GET[$key])) {
-        if ($action == "back") {
-            if (isset($_SERVER["HTTP_REFERER"])) {
-                Helper::redirect($_SERVER["HTTP_REFERER"]);
-            } else {
-                Helper::redirect("/");
-            }
-        } else if (Helper::str_starts_with($action, "/")) {
-            Helper::redirect($action);
-        } else {
-            eview($action);
-        }
-    }
-
-    if ($value !== null) {
-        if ($_GET[$key] !== $value) {
-            if ($action == "back") {
-                if (isset($_SERVER["HTTP_REFERER"])) {
-                    Helper::redirect($_SERVER["HTTP_REFERER"]);
-                } else {
-                    Helper::redirect("/");
-                }
-            } else if (Helper::str_starts_with($action, "/")) {
-                Helper::redirect($action);
-            } else {
-                eview($action);
-            }
-        }
-    }
-}
-function chain_method_post($key, $value = null, $action = "forbidden") {
-    if (!isset($_POST[$key])) {
-        if ($action == "back") {
-            if (isset($_SERVER["HTTP_REFERER"])) {
-                Helper::redirect($_SERVER["HTTP_REFERER"]);
-            } else {
-                Helper::redirect("/");
-            }
-        } else if (Helper::str_starts_with($action, "/")) {
-            Helper::redirect($action);
-        } else {
-            eview($action);
-        }
-    }
-
-    if ($value !== null) {
-        if ($_POST[$key] !== $value) {
-            if ($action == "back") {
-                if (isset($_SERVER["HTTP_REFERER"])) {
-                    Helper::redirect($_SERVER["HTTP_REFERER"]);
-                } else {
-                    Helper::redirect("/");
-                }
-            } else if (Helper::str_starts_with($action, "/")) {
-                Helper::redirect($action);
-            } else {
-                eview($action);
-            }
-        }
-    }
-}
-
-/*
-**
 ** Returns a view (views directory)
 **
 */
 function view(String $view_name, Array $view_data = []) {
 
     // routing wall check
+    global $routes;
     global $wall_rules;
     global $excluded_wall_rules;
+
+    $target = "view->$view_name"; // The target that we will check
+
+    if (in_array($target, $routes)) { // If  true that means this view is called from a route
+        if (isset($wall_rules[$target]) && !in_array($target, $excluded_wall_rules)) { // if that view exists in the $wall_rules array and does not exists in the $excluded_wall_rules array .. we will call the function
+            require_once "routing.wall.functions.php";
+            $wall_rules[$target](); // calling the function from the routing.wall.functions.php
+        }
+    }
 
     // selecting view
     $view_name = str_replace("/", DS, $view_name);
@@ -195,6 +75,53 @@ function controller(String $controller_name, Array $parameters = []) {
     // routing wall check
     global $wall_rules;
     global $excluded_wall_rules;
+
+    $target = "controller->$controller_name"; // The target that we will check
+
+    if (Helper::str_contains($target, "@")) {
+        $target = str_replace("@", "->", $target);
+        if (Helper::str_contains($target, "(") && Helper::str_contains($target, ")")) {
+            $target = substr($target, 0, strpos($target, "("));
+        }
+    }
+
+    /**
+     * $target_arr ==> 0         -> 1            -> 2
+     * $target_arr ==> controller->controllerName->methodName
+     */
+    $target_arr = explode("->", $target);
+
+    if (
+        isset($wall_rules["controller->$target_arr[1]"])
+        &&
+        !in_array("controller->$target_arr[1]", $excluded_wall_rules)
+        )
+    { // if controller->controllerName exists in the wall rules array and does not exist in the excluded array. so the controller is in the wall and we must deal with all the methods inside that controller
+        require_once "routing.wall.functions.php";
+        if (isset($target_arr[2])) { // check if we have a method inside the wall
+            if ( isset( $wall_rules["controller->$target_arr[1]->$target_arr[2]"] ) ) { // if we have a method inside the wall rules we will call the function for it instead of call the function of controller in the wall rules array or -->
+                $wall_rules["controller->$target_arr[1]->$target_arr[2]"]();
+            } else { // or ---> we will call the function of controller in the wall rules array
+                $wall_rules["controller->$target_arr[1]"]();
+            }
+        } else { // call tje function of controller in the wall rules array if we dont have a method inside the wall because we have to check all the methods because we have the controller in the rules
+            $wall_rules["controller->$target_arr[1]"]();
+        }
+    } else { // if we dont have a specific controller but we have specified one method of the controller in the rules .. we have to check it and call the function for it
+        if (isset($target_arr[2])) {
+            if (
+                isset($wall_rules["controller->$target_arr[1]->$target_arr[2]"])
+                && 
+                !in_array("controller->$target_arr[1]->$target_arr[2]", $excluded_wall_rules)
+                &&
+                !in_array("controller->$target_arr[1]", $excluded_wall_rules)
+            )
+            {
+                require_once "routing.wall.functions.php";
+                $wall_rules["controller->$target_arr[1]->$target_arr[2]"]();
+            }
+        }
+    }
 
     // start working
     $controller_name = str_replace("/", "\\", $controller_name);
