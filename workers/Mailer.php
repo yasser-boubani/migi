@@ -13,7 +13,7 @@ class Mailer
     protected $type;
 
     protected $sender_name;
-    protected $sender_email;
+    protected $sender_username;
     protected $sender_password;
 
     /*
@@ -25,7 +25,7 @@ class Mailer
         [
             "type" => "text", // "text" as default or "html"
             "sender_name" => "Sender Name", // 
-            "sender_email" => "Sender Email",
+            "sender_username" => "Sender Username",
             "sender_password" => "Sender Password",
         ]
     */
@@ -48,9 +48,9 @@ class Mailer
         $this->attachments = $attachments;
 
         $this->type = (isset($options["type"])) ? $options["type"] : "text";
-        $this->sender_name = (isset($options["sender_name"])) ? $options["sender_name"] : SENDER_NAME;
-        $this->sender_email = (isset($options["sender_email"])) ? $options["sender_email"] : SENDER_EMAIL;
-        $this->sender_password = (isset($options["sender_password"])) ? $options["sender_password"] : SENDER_PASSWORD;
+        $this->sender_name = (isset($options["sender_name"])) ? $options["sender_name"] : MAIL_NAME;
+        $this->sender_username = (isset($options["sender_username"])) ? $options["sender_username"] : MAIL_USERNAME;
+        $this->sender_password = (isset($options["sender_password"])) ? $options["sender_password"] : MAIL_PASSWORD;
     }
 
     public function send() {
@@ -64,9 +64,9 @@ class Mailer
 
         $mail->Host = MAIL_HOST; // Which SMTP server to use.
         $mail->Port = MAIL_PORT; // Which port to use, 587 is the default port for TLS security.
-        $mail->SMTPSecure = MAIL_SMTP_SECURE; // Which security method to use. TLS is most secure.
+        $mail->SMTPSecure = MAIL_ENCRYPTION; // Which security method to use. TLS is most secure.
         $mail->SMTPAuth = MAIL_SMTP_AUTH; // Whether you need to login. This is almost always required.
-        $mail->Username = $this->sender_email; // Your Gmail address.
+        $mail->Username = $this->sender_username; // Your Gmail address.
         $mail->Password = $this->sender_password; // Your Gmail login password or App Specific Password.
 
         /*
