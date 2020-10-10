@@ -6,7 +6,7 @@ date_default_timezone_set(TIMEZONE); // SET TIMEZONE
 
 require_once _WORKERS_ . "AutoLoader.php";
 
-require_once _NEEDS_ . "routing.control.php";
+require_once _NEEDS_ . "routing" . DS . "routing.control.php";
 
 if (ML) {
     require_once _NEEDS_ . "language.control.php";

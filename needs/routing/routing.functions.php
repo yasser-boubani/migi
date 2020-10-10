@@ -145,42 +145,6 @@ function view(String $view_name, Array $view_data = []) {
     global $wall_rules;
     global $excluded_wall_rules;
 
-    if (!in_array("view->$view_name", $excluded_wall_rules)) { // if this view is not excluded from the wall rules
-        if (isset($wall_rules["view->$view_name"])) { // if this view exists in the wall rules
-
-            if (is_array($wall_rules["view->$view_name"])) {
-                $condition_chain = $wall_rules["view->$view_name"][0];
-                $condition_chain_arr = explode("->", $condition_chain);
-                $action_if_false = $wall_rules["view->$view_name"][1];
-            } else {
-                $condition_chain = $wall_rules["view->$view_name"];
-                $condition_chain_arr = explode("->", $condition_chain);
-                $action_if_false = "forbidden";
-            }
-
-            if (count($condition_chain_arr) == 2) {
-                $chain_method = $condition_chain_arr[0];
-                $chain_key = $condition_chain_arr[1];
-                $chain_value = null;
-            } else if (count($condition_chain_arr) == 3) {
-                $chain_method = $condition_chain_arr[0];
-                $chain_key = $condition_chain_arr[1];
-                $chain_value = $condition_chain_arr[2];
-            } else {
-                exit("Invalid chain condition '$condition_chain' in the wall_rules array!");
-            }
-
-            if ($chain_method == "session" || $chain_method == "cookie" ||
-                $chain_method == "get" || $chain_method == "post")
-            {
-                // (function_name)(key, value, action)
-                ("chain_method_".$chain_method)($chain_key, $chain_value, $action_if_false);
-            } else {
-                exit("Invalid chain method '$chain_method' in '$condition_chain'!");
-            }
-        }
-    }
-
     // selecting view
     $view_name = str_replace("/", DS, $view_name);
     $view_name = str_replace("\\", DS, $view_name);
@@ -231,91 +195,6 @@ function controller(String $controller_name, Array $parameters = []) {
     // routing wall check
     global $wall_rules;
     global $excluded_wall_rules;
-
-    if (Helper::str_contains($controller_name, "@")) {
-        $temp_controller_name = str_replace("@", "->", $controller_name);
-    } else {
-        $temp_controller_name = $controller_name . "->default";
-    }
-
-    $temp_controller_name_without_action = explode("->", $temp_controller_name);
-    $temp_controller_name_without_action = $temp_controller_name_without_action[0];
-
-    if (Helper::str_contains($temp_controller_name, "(") && Helper::str_ends_with($temp_controller_name, ")")) {
-        $temp_controller_name = substr($temp_controller_name, 0, strpos($temp_controller_name, "("));
-    }
-
-    // Helper::pp($temp_controller_name);
-
-    if (!in_array("controller->$temp_controller_name", $excluded_wall_rules)
-        && !in_array("controller->$temp_controller_name_without_action", $excluded_wall_rules)
-    ) { // if this controller is not excluded from the wall rules
-        if (isset($wall_rules["controller->$temp_controller_name"])) { // if this controller exists in the wall rules
-
-            if (is_array($wall_rules["controller->$temp_controller_name"])) {
-                $condition_chain = $wall_rules["controller->$temp_controller_name"][0];
-                $condition_chain_arr = explode("->", $condition_chain);
-                $action_if_false = $wall_rules["controller->$temp_controller_name"][1];
-            } else {
-                $condition_chain = $wall_rules["controller->$temp_controller_name"];
-                $condition_chain_arr = explode("->", $condition_chain);
-                $action_if_false = "forbidden";
-            }
-
-            if (count($condition_chain_arr) == 2) {
-                $chain_method = $condition_chain_arr[0];
-                $chain_key = $condition_chain_arr[1];
-                $chain_value = null;
-            } else if (count($condition_chain_arr) == 3) {
-                $chain_method = $condition_chain_arr[0];
-                $chain_key = $condition_chain_arr[1];
-                $chain_value = $condition_chain_arr[2];
-            } else {
-                exit("Invalid chain condition '$condition_chain' in the wall_rules array!");
-            }
-
-            if ($chain_method == "session" || $chain_method == "cookie" ||
-                $chain_method == "get" || $chain_method == "post")
-            {
-                // (function_name)(key, value, action_if_false)
-                ("chain_method_".$chain_method)($chain_key, $chain_value, $action_if_false);
-            } else {
-                exit("Invalid chain method '$chain_method' in '$condition_chain'!");
-            }
-        } else if (isset($wall_rules["controller->$temp_controller_name_without_action"])) { // if this controller exists in the wall rules
-            
-            if (is_array($wall_rules["controller->$temp_controller_name_without_action"])) {
-                $condition_chain = $wall_rules["controller->$temp_controller_name_without_action"][0];
-                $condition_chain_arr = explode("->", $condition_chain);
-                $action_if_false = $wall_rules["controller->$temp_controller_name_without_action"][1];
-            } else {
-                $condition_chain = $wall_rules["controller->$temp_controller_name_without_action"];
-                $condition_chain_arr = explode("->", $condition_chain);
-                $action_if_false = "forbidden";
-            }
-
-            if (count($condition_chain_arr) == 2) {
-                $chain_method = $condition_chain_arr[0];
-                $chain_key = $condition_chain_arr[1];
-                $chain_value = null;
-            } else if (count($condition_chain_arr) == 3) {
-                $chain_method = $condition_chain_arr[0];
-                $chain_key = $condition_chain_arr[1];
-                $chain_value = $condition_chain_arr[2];
-            } else {
-                exit("Invalid chain condition '$condition_chain' in the wall_rules array!");
-            }
-
-            if ($chain_method == "session" || $chain_method == "cookie" ||
-                $chain_method == "get" || $chain_method == "post")
-            {
-                // (function_name)(key, value, action_if_false)
-                ("chain_method_".$chain_method)($chain_key, $chain_value, $action_if_false);
-            } else {
-                exit("Invalid chain method '$chain_method' in '$condition_chain'!");
-            }
-        }
-    }
 
     // start working
     $controller_name = str_replace("/", "\\", $controller_name);
